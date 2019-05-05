@@ -1,0 +1,24 @@
+QUERY 1: total spent amount of money grouped by month
+SELECT SUM(ppl * volume) as total_amount, MONTH(registered) FROM CONSUMPTION
+GROUP BY Month(registered)
+
+SELECT SUM(ppl * volume) as total_amount, MONTH(registered) FROM CONSUMPTION
+WHERE driver_id = 'D00002'
+GROUP BY Month(registered)
+
+QUERY 2: list fuel consumption records for specified month (each row should contain: fuel type, volume, date, price, total price, driver ID)
+
+SELECT fuel_type, volume, registered, ppl, (ppl*volume) total_price, driver_id FROM consumption
+WHERE MONTH(registered) = 5
+
+SELECT fuel_type, volume, registered, ppl, (ppl*volume) total_price, driver_id FROM consumption
+WHERE MONTH(registered) = 5 AND driver_id = 'D00003'
+
+QUERY 3: statistics for each month, list fuel consumption records grouped by fuel type (each row should contain: fuel type, volume, average price, total price)
+
+SELECT COUNT(id), fuel_type, SUM(volume) AS volume, AVG(ppl) AS average_price, SUM(volume*ppl) AS total_price FROM consumption
+GROUP BY fuel_type;
+
+SELECT COUNT(id), fuel_type, SUM(volume) AS volume, AVG(ppl) AS average_price, SUM(volume*ppl) AS total_price FROM consumption
+WHERE driver_id = 'D00002'
+GROUP BY fuel_type;
