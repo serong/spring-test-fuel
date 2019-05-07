@@ -3,15 +3,21 @@ package com.swb.fuel.controllers;
 import com.swb.fuel.models.APIResponse;
 import com.swb.fuel.models.FuelConsumption;
 import com.swb.fuel.repository.ConsumptionRepository;
+import com.swb.fuel.utilities.MultipartParser;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/fuel")
@@ -45,8 +51,27 @@ public class ConsumptionController {
                 .setVolume(volume)
                 .build();
 
-        consumptionRepository.save(fc);
-        return ResponseEntity.ok(new APIResponse("success", null, null));
+        FuelConsumption saved = consumptionRepository.save(fc);
+        return ResponseEntity.ok(new APIResponse("success", saved, null));
+    }
+
+
+    /**
+     * Add batch fuel consumption records from CSV file.
+     *
+     * @param file CSV
+     *
+     * @return
+     * @throws IOException
+     * @throws ParseException
+     */
+    @PostMapping("/batch")
+    public ResponseEntity<APIResponse> addBatchFuelConsumption(@RequestParam MultipartFile file) throws IOException, ParseException {
+
+        List<FuelConsumption> fcList = MultipartParser.fuelConsumptions(file);
+        Iterable<FuelConsumption> saved = consumptionRepository.saveAll(fcList);
+
+        return ResponseEntity.ok(new APIResponse("success", saved, null));
     }
 
 
@@ -56,6 +81,11 @@ public class ConsumptionController {
 
     @ExceptionHandler(ParseException.class)
     public ResponseEntity<APIResponse> handleDateParseException(Exception ex) {
+        return ResponseEntity.status(400).body(new APIResponse("error", null, ex.getMessage()));
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<APIResponse> handleIOException(Exception ex) {
         return ResponseEntity.status(400).body(new APIResponse("error", null, ex.getMessage()));
     }
 }

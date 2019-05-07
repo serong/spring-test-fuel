@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.List;
 
 public interface ConsumptionRepository extends CrudRepository<FuelConsumption, Long> {
 
@@ -21,4 +22,7 @@ public interface ConsumptionRepository extends CrudRepository<FuelConsumption, L
     // Alternative way to add fuel consumption, as a model.
     @Override
     FuelConsumption save(FuelConsumption fc);
+
+    @Override
+    <S extends FuelConsumption> Iterable<S> saveAll(Iterable<S> iterable);
 }
