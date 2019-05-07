@@ -1,14 +1,13 @@
 package com.swb.fuel.controllers;
 
+import com.swb.fuel.models.APIResponse;
 import com.swb.fuel.models.FuelConsumption;
 import com.swb.fuel.repository.ConsumptionRepository;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -22,29 +21,41 @@ public class ConsumptionController {
     @Autowired
     private ConsumptionRepository consumptionRepository;
 
+    /**
+     * Add single fuel consumption record.
+     *
+     * @param fuelType String
+     * @param driverId String
+     * @param ppl BigDecimal
+     * @param volume BigDecimal
+     * @param registered String, date formatted as MM.dd.yyyy (12.30.2019)
+     *
+     * @return
+     * @throws ParseException
+     */
     @PostMapping("/add")
-    public void addFuelConsumption(@RequestParam String fuelType, @RequestParam String driverId,
+    public ResponseEntity<APIResponse> addFuelConsumption(@RequestParam String fuelType, @RequestParam String driverId,
                                    @RequestParam BigDecimal ppl, @RequestParam BigDecimal volume,
-                                   @RequestParam String registeredText) throws ParseException {
+                                   @RequestParam String registered) throws ParseException {
 
-        FuelConsumption fc = new FuelConsumption();
-        fc.setFuelType("99");
-        fc.setDriverId("D00005");
-        fc.setPpl(BigDecimal.valueOf(12L));
-        fc.setVolume(BigDecimal.valueOf(10L));
-        fc.setRegistered(new Date(System.currentTimeMillis()));
-
-        FuelConsumption fc1 = new FuelConsumption.Builder(registeredText)
+        FuelConsumption fc = new FuelConsumption.Builder(registered)
                 .setDriverId(driverId)
                 .setFuelType(fuelType)
                 .setPpl(ppl)
                 .setVolume(volume)
                 .build();
 
-
-        consumptionRepository.addFuelConsumption(fc.getFuelType(), fc.getPpl(), fc.getVolume(), fc.getRegistered(), fc.getDriverId());
-
         consumptionRepository.save(fc);
-        consumptionRepository.save(fc1);
+        return ResponseEntity.ok(new APIResponse("success", null, null));
+    }
+
+
+    /**
+     * Exception handlers for the controller.
+     */
+
+    @ExceptionHandler(ParseException.class)
+    public ResponseEntity<APIResponse> handleDateParseException(Exception ex) {
+        return ResponseEntity.status(400).body(new APIResponse("error", null, ex.getMessage()));
     }
 }
