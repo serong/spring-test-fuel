@@ -4,6 +4,10 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
+/**
+ * Statistics for months.
+ */
+
 @Data
 public class StatisticsReport implements Report {
     private String fuelType;

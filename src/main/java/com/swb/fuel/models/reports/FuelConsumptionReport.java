@@ -7,6 +7,9 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 
+/**
+ * Fuel consumption report for month.
+ */
 @Data
 public class FuelConsumptionReport implements Report {
     private static String dateFormat = "MM.dd.yyyy";

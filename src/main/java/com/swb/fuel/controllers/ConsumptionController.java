@@ -34,8 +34,8 @@ public class ConsumptionController {
      * @param volume BigDecimal
      * @param registered String, date formatted as MM.dd.yyyy (12.30.2019)
      *
-     * @return
-     * @throws ParseException
+     * @return ResponseEntity
+     * @throws ParseException (Parsing the date text)
      */
     @PostMapping("/add")
     public ResponseEntity<APIResponse> addFuelConsumption(@RequestParam String fuelType, @RequestParam String driverId,
@@ -45,6 +45,7 @@ public class ConsumptionController {
         if (!InputValidation.isValidDriverid(driverId) || !InputValidation.isValidFuelType(fuelType) ||
             !InputValidation.isValidPPL(ppl) || !InputValidation.isValidVolume(volume) ||
             !InputValidation.isValidDateText(registered)) {
+
             return ResponseEntity.status(400).body(new APIResponse("error", null, "Invalid parameters"));
         }
 
@@ -63,11 +64,14 @@ public class ConsumptionController {
     /**
      * Add batch fuel consumption records from CSV file.
      *
+     * Values in each row are validated in MultipartParser and if fails,
+     * the row is skipped and written to the logs.
+     *
      * @param file CSV
      *
-     * @return
-     * @throws IOException
-     * @throws ParseException
+     * @return ResponseEntity
+     * @throws IOException (Reading the file)
+     * @throws ParseException (Parsing the date text)
      */
     @PostMapping("/batch")
     public ResponseEntity<APIResponse> addBatchFuelConsumption(@RequestParam MultipartFile file) throws IOException, ParseException {

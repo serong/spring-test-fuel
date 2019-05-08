@@ -25,6 +25,7 @@ public class MultipartParser {
         CSVParser parser = CSVParser.parse(fileContent, CSVFormat.EXCEL.withHeader());
 
         for (CSVRecord row: parser) {
+
             // Parameters from the row.
             String driverId = row.get("driver_id");
             String fuelType = row.get("fuel_type");
@@ -32,6 +33,7 @@ public class MultipartParser {
             BigDecimal ppl = new BigDecimal(row.get("ppl"));
             String registered = row.get("registered");
 
+            // Rows with invalid values are skipped and written to the logs.
             if (!InputValidation.isValidDriverid(driverId) || !InputValidation.isValidFuelType(fuelType) ||
                 !InputValidation.isValidPPL(ppl) || !InputValidation.isValidVolume(volume) ||
                 !InputValidation.isValidDateText(registered)) {
@@ -40,7 +42,6 @@ public class MultipartParser {
                 continue;
             }
 
-            // TODO: Validation for row values.
             FuelConsumption fc = new FuelConsumption.Builder(registered)
                     .setDriverId(driverId)
                     .setFuelType(fuelType)

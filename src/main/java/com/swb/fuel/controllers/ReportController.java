@@ -75,7 +75,8 @@ public class ReportController {
 
     /**
      * Get fuel consumptions statistics grouped by fuel type
-     * @return
+     *
+     * @return ResponseEntity
      */
     @PostMapping("/statistics")
     public ResponseEntity<APIResponse> getStatisticsReportByFuelType() {
@@ -88,7 +89,7 @@ public class ReportController {
      *
      * @param driverId String
      *
-     * @return
+     * @return ResponseEntity
      */
     @PostMapping("/statistics/driver")
     public ResponseEntity<APIResponse> getStatisticsReportByFuelTypeForDriver(@RequestParam String driverId) {
