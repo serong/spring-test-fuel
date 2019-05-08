@@ -3,26 +3,24 @@ package com.swb.fuel.controllers;
 import com.swb.fuel.models.APIResponse;
 import com.swb.fuel.models.FuelConsumption;
 import com.swb.fuel.repository.ConsumptionRepository;
+import com.swb.fuel.utilities.InputValidation;
 import com.swb.fuel.utilities.MultipartParser;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/fuel")
 @Api("Fuel consumption controller")
 public class ConsumptionController {
+
 
     @Autowired
     private ConsumptionRepository consumptionRepository;
@@ -43,6 +41,12 @@ public class ConsumptionController {
     public ResponseEntity<APIResponse> addFuelConsumption(@RequestParam String fuelType, @RequestParam String driverId,
                                    @RequestParam BigDecimal ppl, @RequestParam BigDecimal volume,
                                    @RequestParam String registered) throws ParseException {
+
+        if (!InputValidation.isValidDriverid(driverId) || !InputValidation.isValidFuelType(fuelType) ||
+            !InputValidation.isValidPPL(ppl) || !InputValidation.isValidVolume(volume) ||
+            !InputValidation.isValidDateText(registered)) {
+            return ResponseEntity.status(400).body(new APIResponse("error", null, "Invalid parameters"));
+        }
 
         FuelConsumption fc = new FuelConsumption.Builder(registered)
                 .setDriverId(driverId)
